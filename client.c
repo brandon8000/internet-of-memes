@@ -10,8 +10,7 @@
 #define MAXRCVLEN 500
 #define PORTNUM 9000
 
-int main(int argc, char *argv[])
-{
+void sampleConnection(){
 	char buffer[MAXRCVLEN + 1]; /* +1 so we can add null terminator */
 	int len, mysocket;
 	struct sockaddr_in dest;
@@ -23,11 +22,33 @@ int main(int argc, char *argv[])
 	dest.sin_port = htons(PORTNUM); /* set destination port number*/
 	connect(mysocket, (struct sockaddr *)&dest, sizeof(struct sockaddr));
 	len = recv(mysocket, buffer, MAXRCVLEN, 0);
-	
+
 	/* We have to null terminate the received data ourselves */
 	buffer[len] = '\0';
-	printf("Received %s (%d bytes).\n", buffer, len);
+	printf("\tReceived %s (%d bytes).\n", buffer, len);
 	close(mysocket);
+}
+
+int main(int argc, char *argv[])
+{
+	int choice = -1;
 	
+	printf("Welcome to the client software. Ready to receive files?\n");
+	while(choice != 0){
+		printf("What would you like to do?\n1. Test a local connection to the server.\n0. Quit.\n");
+		scanf("%d", &choice);
+		puts("");
+		switch(choice){
+		case 0:
+			break;
+		case 1:
+			sampleConnection();
+			break;
+		default:
+			printf("That is not a valid option!");
+		}
+		puts("");
+	}
+	printf("Thank you for your participation!\n");
 	return EXIT_SUCCESS;
 }

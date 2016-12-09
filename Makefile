@@ -14,7 +14,7 @@ CFLAGS  = -g -Wall
 
 
 # build an executable named memgrind from memgrind.c and mymalloc.c
-default: clean worker procs thread
+default: clean server client
 
 # Create the file server executable
 server:
