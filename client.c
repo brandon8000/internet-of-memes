@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include "libnetfiles.h"
 
 #define MAXRCVLEN 500
 #define PORTNUM 9000
@@ -33,19 +34,20 @@ int main(int argc, char *argv[])
 {
 	int choice = -1;
 	
-	printf("Welcome to the client software. Ready to receive files?\n");
+	printf("Welcome to the client software. Ready to interact with remote files?\n");
 	while(choice != 0){
 		printf("What would you like to do?\n1. Test a local connection to the server.\n0. Quit.\n");
 		scanf("%d", &choice);
 		puts("");
 		switch(choice){
 		case 0:
+			foolio();
 			break;
 		case 1:
 			sampleConnection();
 			break;
 		default:
-			printf("That is not a valid option!");
+			printf("That is not a valid option!\n");
 		}
 		puts("");
 	}

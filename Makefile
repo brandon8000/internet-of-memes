@@ -1,6 +1,6 @@
-# This is the Makefile for Group 53's Asst2 project. This
+# This is the Makefile for Group 53's Asst3 project. This
 # program uses our custom-made mymalloc library.
-# Typing 'make' or 'make memgrind' will create the executable file.
+# Typing 'make' will create the necessary executable file.
 #
 
 # first we define some Makefile variables for the compiler and compiler flags
@@ -13,23 +13,24 @@ CC = gcc
 CFLAGS  = -g -Wall
 
 
-# build an executable named memgrind from memgrind.c and mymalloc.c
-default: clean server client
+# remove old builds and then start a new build
+# CHANGE THIS BEFORE SUBMISSION (should be "default: clean server")
+default: clean server library client
 
 # Create the file server executable
 server:
 	$(CC) $(CFLAGS) -o server netfileserver.c
 
+# Create the library object file
+library: libnetfiles.h
+	$(CC) $(CFLAGS) -c libnetfiles.c
+
 # Create the client executable
 client:
-	$(CC) $(CFLAGS) -o client client.c
-
-# Create the process-oriented program executable
-#thread:
-#	$(CC) $(CFLAGS) -o thread compressT_LOLS.c -lpthread
+	$(CC) $(CFLAGS) -o client client.c libnetfiles.o
 
 # To start over from scratch, type 'make clean'.  This
 # removes the executable file, as well as old .o object
-# files and *~ backup files:
+# files and any ~ backup files:
 clean:
 	$(RM) client server *.o *~
