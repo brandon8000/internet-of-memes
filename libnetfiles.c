@@ -1,9 +1,15 @@
 #include <stdio.h>
-//I don't know how many imports we will need, LOL
-//#include <unistd.h>
-//#include <stdlib.h>
-//#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <fcntl.h>
 #include "libnetfiles.h"
+#define MAXRCVLEN 2048
+#define PORTNUM 9000
 
 int total_foo = 42;
 
@@ -14,19 +20,79 @@ void foolio(){
 
 //this is where the real code begins!
 
-extern int netopen(const char* pathname, int flags){
+extern int netserverinit(char* hostname){
 	return -1;
 }
 
-extern ssize_t netread(int fildes, void* buf, size_t nbyte){
+/* For extension A only
+extern int netserverinit(char* hostname, int filemode){
 	return -1;
+}
+*/
+
+extern char* sendRequest(char* message){
+	void* babyBuff = malloc(sizeof(char) * MAXRCVLEN);
+	int mysocket;
+	struct sockaddr_in dest;
+	int delivered;
+	
+	mysocket = socket(AF_INET, SOCK_STREAM, 0);
+	socklen_t socksize = sizeof(struct sockaddr_in);
+	memset(&dest, 0, sizeof(dest)); /* zero the struct */
+	dest.sin_family = AF_INET;
+	dest.sin_addr.s_addr = inet_addr("127.0.0.1"); /* set destination IP number*/
+	dest.sin_port = htons(PORTNUM); /* set destination port number*/
+	
+	connect(mysocket, (struct sockaddr *) &dest, sizeof(struct sockaddr) );
+	delivered = sendto(mysocket, message, strlen(message), 0, (struct sockaddr *) &dest, sizeof(struct sockaddr));
+	printf("\t%d out of %d bytes were sent\n",delivered, (int) strlen(message) );
+	
+	recvfrom(mysocket, babyBuff, MAXRCVLEN, 0, (struct sockaddr *) &dest, &socksize);
+	printf("\tReceived %s\n", (char*) babyBuff );
+	
+	close(mysocket);
+	return babyBuff;
+}
+
+extern int netopen(const char* pathname, int flags){
+	//maybe do some error checking
+	char* paramBundle = (char*) malloc( sizeof(char*) * (strlen(pathname) +1 ) );
+	sprintf(paramBundle, "o%d%s",flags,pathname);
+	return *( (int*) sendRequest(paramBundle) );
+}
+/*
+extern ssize_t netread(int fildes, void* buf, size_t nbyte){
+	requestParam* sendParam = (requestParam*) malloc(sizeof(requestParam));
+	requestParam* returnParam = (requestParam*) malloc(sizeof(requestParam));
+	
+	sendParam -> requestType = 'r';
+	sendParam -> descriptor = fildes;
+	sendParam -> finalParam = nbyte;
+	
+	returnParam = (requestParam*) sendRequest( (char*) sendParam);
+	return returnParam -> finalParam;
 }
 
 extern ssize_t netwrite(int fildes, const void* buf, size_t nbyte){
-	return -1;
+	requestParam* sendParam = (requestParam*) malloc(sizeof(requestParam));
+	requestParam* returnParam = (requestParam*) malloc(sizeof(requestParam));
+	
+	sendParam -> requestType = 'w';
+	sendParam -> descriptor = fildes;
+	sendParam -> finalParam = nbyte;
+	
+	returnParam = (requestParam*) sendRequest( (char*) sendParam);
+	return returnParam -> finalParam;
 }
 
 extern int netclose(int fd){
-	return -1;
+	requestParam* sendParam = (requestParam*) malloc(sizeof(requestParam));
+	requestParam* returnParam = (requestParam*) malloc(sizeof(requestParam));
+	
+	sendParam -> requestType = 'c';
+	sendParam -> descriptor = fd;
+	
+	returnParam = (requestParam*) sendRequest( (char*) sendParam);
+	return returnParam -> finalParam;
 }
-
+*/

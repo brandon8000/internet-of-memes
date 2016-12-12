@@ -3,13 +3,14 @@
 
     #include <stdlib.h>
     
-    // a sample constant definition that is exported by this library:
-    #define MAX_FOO  20
+    // This constant represents the maximum length of a file path that we will accept
+    #define MAX_FILE_PATH 300
 
     // a sample type definition that is exported by library:
 	struct foo_struct {  
 		int x;
         float y;
+        char* words;
     };
     typedef struct foo_struct foo_struct;
 
@@ -22,6 +23,14 @@
     // a sample function prototype for a function exported by library:
     extern void foolio();
     
+    extern int netserverinit(char* hostname);
+
+	/* For extension A only
+	extern int netserverinit(char* hostname, int filemode);
+	*/
+
+	extern char* sendRequest(char* message);
+	
     /*
     The argument flags must include one of the following access modes: O_RDONLY, O_WRONLY, or O_RDWR.
     These request opening the file read-only, write-only, or read/write, respectively.
