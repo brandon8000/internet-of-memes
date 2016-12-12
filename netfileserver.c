@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 	//a boolean flag to let us know when the server has accomplished its mission.
 	int responseSent;
 	//int loopCounter;
+	int delivered = -32;
 	while(consocket)
 	{
 		/*Spawn a thread to do the real work*/
@@ -68,12 +69,20 @@ int main(int argc, char *argv[])
 			printf("\tpath: %s\n\tflag: %d\n",path,firstParam);
 			int fildes = open(path, firstParam);
 			printf("Returning %d to the client, of size %d\n", fildes, (int) sizeof(&fildes) );
-			int delivered = sendto(consocket, &fildes, (int) sizeof(&fildes), 0, (struct sockaddr *) &dest, socksize);
+			delivered = sendto(consocket, &fildes, (int) sizeof(&fildes), 0, (struct sockaddr *) &dest, socksize);
 			printf("\t%d out of %d bytes were returned\n",delivered,(int) sizeof(&fildes));
 			++responseSent;
 			break;
 		case 'c':
-			printf("We will close another day...\n");
+			// need to add some kind of code here because GCC throws errors when
+			// you start a case block with a declaration;
+			delivered = -33;
+			char* givenInteger = (char*) malloc(sizeof(char) * (msglen-1) );
+			givenInteger = &(request[1]);
+			int output = close(atoi(givenInteger));
+			delivered = sendto(consocket, &output, (int) sizeof(&output), 0, (struct sockaddr *) &dest, socksize);
+			printf("\t%d out of %d bytes were returned\n",delivered,(int) sizeof(&output));
+			++responseSent;
 			break;
 		default:
 			//set errors

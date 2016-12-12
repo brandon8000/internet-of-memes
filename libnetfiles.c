@@ -62,37 +62,26 @@ extern int netopen(const char* pathname, int flags){
 }
 /*
 extern ssize_t netread(int fildes, void* buf, size_t nbyte){
-	requestParam* sendParam = (requestParam*) malloc(sizeof(requestParam));
-	requestParam* returnParam = (requestParam*) malloc(sizeof(requestParam));
-	
-	sendParam -> requestType = 'r';
-	sendParam -> descriptor = fildes;
-	sendParam -> finalParam = nbyte;
-	
-	returnParam = (requestParam*) sendRequest( (char*) sendParam);
-	return returnParam -> finalParam;
+	//maybe do some error checking
+	char* paramBundle = (char*) malloc( sizeof(char*) * (strlen(pathname) +1 ) );
+	sprintf(paramBundle, "o%d%s",flags,pathname);
+	return *( (int*) sendRequest(paramBundle) );
 }
 
 extern ssize_t netwrite(int fildes, const void* buf, size_t nbyte){
-	requestParam* sendParam = (requestParam*) malloc(sizeof(requestParam));
-	requestParam* returnParam = (requestParam*) malloc(sizeof(requestParam));
-	
-	sendParam -> requestType = 'w';
-	sendParam -> descriptor = fildes;
-	sendParam -> finalParam = nbyte;
-	
-	returnParam = (requestParam*) sendRequest( (char*) sendParam);
-	return returnParam -> finalParam;
-}
-
-extern int netclose(int fd){
-	requestParam* sendParam = (requestParam*) malloc(sizeof(requestParam));
-	requestParam* returnParam = (requestParam*) malloc(sizeof(requestParam));
-	
-	sendParam -> requestType = 'c';
-	sendParam -> descriptor = fd;
-	
-	returnParam = (requestParam*) sendRequest( (char*) sendParam);
-	return returnParam -> finalParam;
+	//maybe do some error checking
+	char* paramBundle = (char*) malloc( sizeof(char*) * (strlen(pathname) +1 ) );
+	sprintf(paramBundle, "o%d%s",flags,pathname);
+	return *( (int*) sendRequest(paramBundle) );
 }
 */
+extern int netclose(int fd){
+	//maybe do some error checking
+	// This allocation of 3 bytes assumes one byte for the first character
+	// and a maximum of 2 bytes for the passed in file descriptor
+	//(which means a file descriptor of 99 or less)
+	char* paramBundle = (char*) malloc( sizeof(char*) * 3);
+	sprintf(paramBundle, "c%d",fd);
+	return *( (int*) sendRequest(paramBundle) );
+}
+
